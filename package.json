@@ -1,0 +1,30 @@
+{
+  "name": "desafio03-find-a-friend",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "scripts": {
+    "dev": "tsx watch src/server.ts",
+    "start": "node build/server.js",
+    "build": "tsup src --out-dir build"
+  },
+  "devDependencies": {
+    "@types/node": "^20.4.4",
+    "@typescript-eslint/eslint-plugin": "^5.52.0",
+    "eslint": "^8.0.1",
+    "eslint-config-standard-with-typescript": "37.0.0",
+    "eslint-plugin-import": "^2.25.2",
+    "eslint-plugin-n": "^15.0.0 || ^16.0.0 ",
+    "eslint-plugin-promise": "^6.0.0",
+    "prisma": "5.0.0",
+    "tsup": "^7.1.0",
+    "tsx": "^3.12.7",
+    "typescript": "*"
+  },
+  "dependencies": {
+    "@prisma/client": "5.0.0",
+    "dotenv": "16.3.1",
+    "fastify": "^4.20.0",
+    "zod": "3.21.4"
+  }
+}
