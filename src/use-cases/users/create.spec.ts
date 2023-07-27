@@ -2,14 +2,17 @@ import { expect, describe, it, beforeEach } from 'vitest'
 import { CreateUseCase } from './create'
 import { InMemoryUsersRepository } from '@/repositories/in-memory/in-memory-users-repository'
 import { compare } from 'bcryptjs';
+import { BcryptAdapter } from '@/utils/criptography/bcrypt-adapter';
 
 let usersRepository: InMemoryUsersRepository;
+let bcryptAdapter: BcryptAdapter;
 let sut: CreateUseCase;
 
 describe('Create user use case', () => {
    beforeEach(() => {
       usersRepository = new InMemoryUsersRepository();
-      sut = new CreateUseCase(usersRepository);
+      bcryptAdapter = new BcryptAdapter(6);
+      sut = new CreateUseCase(usersRepository, bcryptAdapter);
    });
 
    it('should be able to create a user', async () => {

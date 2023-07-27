@@ -3,6 +3,7 @@ import { hash } from 'bcryptjs';
 
 import { Users as User } from '@prisma/client'
 import { IUsersRepository } from '@/repositories/IUsers-repository';
+import { IEncrypter } from '@/utils/criptography/IEncrypter';
 
 interface CreateUserHttpRequest {
    name: string,
@@ -20,10 +21,11 @@ interface UserHttpResponse {
 export class CreateUseCase {
    constructor(
       private usersRepository: IUsersRepository,
+      private readonly encrypter: IEncrypter,
    ) { }
 
-   async execute({ name, mail, postalCode, fullAddress, phone, password }: CreateUserHttpRequest): Promise<UserHttpResponse> {
-      const password_hash = await hash(password, 6);
+   async execute({ name, mail, postalCode, fullAddress, phone, password }: CreateUserHttpRequest): Promise<UserHttpResponse> {      
+      const password_hash = await this.encrypter.encrypt(password);
 
       const user = await this.usersRepository.create({
          id: randomUUID(),
