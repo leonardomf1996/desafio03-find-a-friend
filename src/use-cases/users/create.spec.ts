@@ -3,6 +3,7 @@ import { CreateUseCase } from './create'
 import { InMemoryUsersRepository } from '@/repositories/in-memory/in-memory-users-repository'
 import { compare } from 'bcryptjs';
 import { BcryptAdapter } from '@/utils/criptography/bcrypt-adapter';
+import { UserAlreadyExists } from '../errors/user-already-exists';
 
 let usersRepository: InMemoryUsersRepository;
 let bcryptAdapter: BcryptAdapter;
@@ -56,5 +57,29 @@ describe('Create user use case', () => {
       })
 
       expect(encryptSpy).toHaveBeenCalledWith('abc123');
+   });
+
+   it('should not be able to register with same email twice', async () => {
+      const mail = 'john@mail.com';
+
+      await sut.execute({
+         name: 'John Doe',
+         mail,
+         fullAddress: 'full address, 30',
+         phone: '14999999999',
+         postalCode: '88888888',
+         password: 'abc123',
+      });
+
+      await expect(() => {
+         return sut.execute({
+            name: 'John Doe',
+            mail,
+            fullAddress: 'full address, 30',
+            phone: '14999999999',
+            postalCode: '88888888',
+            password: 'abc123',
+         });
+      }).rejects.toBeInstanceOf(UserAlreadyExists);
    });
 })
