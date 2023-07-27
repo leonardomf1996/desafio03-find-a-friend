@@ -1,4 +1,4 @@
-import { expect, describe, it, beforeEach } from 'vitest'
+import { expect, describe, it, beforeEach, vi } from 'vitest'
 import { CreateUseCase } from './create'
 import { InMemoryUsersRepository } from '@/repositories/in-memory/in-memory-users-repository'
 import { compare } from 'bcryptjs';
@@ -41,5 +41,20 @@ describe('Create user use case', () => {
       const isPasswordCorrectlyHashed = await compare('abc123', user.passwordHashed);
 
       expect(isPasswordCorrectlyHashed).toBe(true);
+   });
+
+   it('should call Encrypter with correct password', async () => {
+      const encryptSpy = vi.spyOn(bcryptAdapter, 'encrypt');
+
+      await sut.execute({
+         name: 'John Doe',
+         mail: 'john@mail.com',
+         fullAddress: 'full address, 30',
+         phone: '14999999999',
+         postalCode: '88888888',
+         password: 'abc123',
+      })
+
+      expect(encryptSpy).toHaveBeenCalledWith('abc123');
    });
 })
