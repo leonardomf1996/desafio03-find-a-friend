@@ -4,6 +4,7 @@ import { hash } from 'bcryptjs';
 import { Users as User } from '@prisma/client'
 import { IUsersRepository } from '@/repositories/IUsers-repository';
 import { IEncrypter } from '@/utils/criptography/IEncrypter';
+import { UserAlreadyExists } from '../errors/user-already-exists';
 
 interface CreateUserHttpRequest {
    name: string,
@@ -26,6 +27,12 @@ export class CreateUseCase {
 
    async execute({ name, mail, postalCode, fullAddress, phone, password }: CreateUserHttpRequest): Promise<UserHttpResponse> {      
       const password_hash = await this.encrypter.encrypt(password);
+
+      const userAlreadyExists = await this.usersRepository.findByEmail(mail);
+
+      if (userAlreadyExists) {
+         throw new UserAlreadyExists();
+      }
 
       const user = await this.usersRepository.create({
          id: randomUUID(),
