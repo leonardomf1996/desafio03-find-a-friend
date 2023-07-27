@@ -1,6 +1,7 @@
-import { Users as User } from '@prisma/client'
-import { prisma } from '../../lib/prisma'
 import { randomUUID } from 'node:crypto';
+import { hash } from 'bcryptjs';
+
+import { Users as User } from '@prisma/client'
 import { IUsersRepository } from '@/repositories/IUsers-repository';
 
 interface CreateUserHttpRequest {
@@ -22,6 +23,8 @@ export class CreateUseCase {
    ) { }
 
    async execute({ name, mail, postalCode, fullAddress, phone, password }: CreateUserHttpRequest): Promise<UserHttpResponse> {
+      const password_hash = await hash(password, 6);
+
       const user = await this.usersRepository.create({
          id: randomUUID(),
          name,
@@ -29,7 +32,7 @@ export class CreateUseCase {
          postalCode,
          fullAddress,
          phone,
-         passwordHashed: password,
+         passwordHashed: password_hash,
          createdAt: new Date(),
       })
 
