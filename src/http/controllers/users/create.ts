@@ -1,7 +1,5 @@
-import { PrismaUsersRepository } from "@/repositories/prisma/prisma-users-repository";
 import { UserAlreadyExists } from "@/use-cases/errors/user-already-exists";
-import { CreateUseCase } from "@/use-cases/users/create";
-import { BcryptAdapter } from "@/utils/criptography/bcrypt-adapter";
+import { createUserFactory } from "@/use-cases/factories/create-user-factory";
 import { FastifyReply, FastifyRequest } from "fastify";
 import { z } from "zod";
 
@@ -18,9 +16,7 @@ export async function create(request: FastifyRequest, reply: FastifyReply) {
    const { name, mail, password, postalCode, fullAddress, phone } = createBodySchema.parse(request.body);
 
    try {
-      const usersRepository = new PrismaUsersRepository();
-      const bcryptAdapter = new BcryptAdapter(6);
-      const createUserUseCase = new CreateUseCase(usersRepository, bcryptAdapter);
+      const createUserUseCase = createUserFactory();
 
       await createUserUseCase.execute({ name, mail, password, postalCode, fullAddress, phone });
 
