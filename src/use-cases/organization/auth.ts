@@ -2,6 +2,7 @@ import { IOrganizationsRepository } from '@/repositories/IOrganizations-reposito
 import { InvalidCredentialsError } from '../errors/invalid-credentials-error';
 import { compare } from 'bcryptjs';
 import { Organizations as Organization } from '@prisma/client';
+import { IEncrypter } from '@/utils/criptography/IEncrypter';
 
 interface AuthenticateUseCaseRequest {
    mail: string
@@ -14,7 +15,8 @@ interface AuthenticateUseCaseResponse {
 
 export class AuthenticateUseCase {
    constructor(
-      private organizationsRepository: IOrganizationsRepository
+      private organizationsRepository: IOrganizationsRepository,
+      private encrypter: IEncrypter,
    ) { }
 
    async execute({ mail, password }: AuthenticateUseCaseRequest): Promise<AuthenticateUseCaseResponse> {
@@ -24,7 +26,7 @@ export class AuthenticateUseCase {
          throw new InvalidCredentialsError();
       }
 
-      const doesPasswordMatches = await compare(password, organization.passwordHashed);
+      const doesPasswordMatches = await this.encrypter.compare(password, organization.passwordHashed);
 
       if (doesPasswordMatches) {
          throw new InvalidCredentialsError();
