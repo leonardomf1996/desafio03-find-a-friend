@@ -10,13 +10,13 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model Users {
-  id             String   @id @default(uuid())
-  name           String
-  mail           String   @unique
-  postalCode     String   @db.VarChar(8)
-  fullAddress    String
-  phone          String
-  passwordHashed String
-  createdAt      DateTime @default(now())
+model Organizations {
+  id              String   @id @default(uuid())
+  responsibleName String
+  mail            String   @unique
+  postalCode      String   @db.VarChar(8)
+  fullAddress     String
+  phone           String
+  passwordHashed  String
+  createdAt       DateTime @default(now())
 }

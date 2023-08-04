@@ -1,24 +1,24 @@
 import { expect, describe, it, beforeEach, vi } from 'vitest'
 import { CreateUseCase } from './create'
-import { InMemoryUsersRepository } from '@/repositories/in-memory/in-memory-users-repository'
+import { InMemoryOrganizationsRepository } from '@/repositories/in-memory/in-memory-organizations-repository'
 import { compare } from 'bcryptjs';
 import { BcryptAdapter } from '@/utils/criptography/bcrypt-adapter';
-import { UserAlreadyExists } from '../errors/user-already-exists';
+import { OrganizationAlreadyExists } from '../errors/organization-already-exists';
 
-let usersRepository: InMemoryUsersRepository;
+let organizationsRepository: InMemoryOrganizationsRepository;
 let bcryptAdapter: BcryptAdapter;
 let sut: CreateUseCase;
 
 describe('Create user use case', () => {
    beforeEach(() => {
-      usersRepository = new InMemoryUsersRepository();
+      organizationsRepository = new InMemoryOrganizationsRepository();
       bcryptAdapter = new BcryptAdapter(6);
-      sut = new CreateUseCase(usersRepository, bcryptAdapter);
+      sut = new CreateUseCase(organizationsRepository, bcryptAdapter);
    });
 
-   it('should be able to create a user', async () => {
-      const { user } = await sut.execute({
-         name: 'John Doe',
+   it('should be able to create a org', async () => {
+      const { organization } = await sut.execute({
+         responsibleName: 'John Doe',
          mail: 'john@mail.com',
          fullAddress: 'full address, 30',
          phone: '14999999999',
@@ -26,12 +26,12 @@ describe('Create user use case', () => {
          password: 'abc123',
       });
 
-      expect(user.id).toEqual(expect.any(String));
+      expect(organization.id).toEqual(expect.any(String));
    });
 
-   it('should hash user password upon registration', async () => {
-      const { user } = await sut.execute({
-         name: 'John Doe',
+   it('should hash org password upon registration', async () => {
+      const { organization } = await sut.execute({
+         responsibleName: 'John Doe',
          mail: 'john@mail.com',
          fullAddress: 'full address, 30',
          phone: '14999999999',
@@ -39,7 +39,7 @@ describe('Create user use case', () => {
          password: 'abc123',
       });
 
-      const isPasswordCorrectlyHashed = await compare('abc123', user.passwordHashed);
+      const isPasswordCorrectlyHashed = await compare('abc123', organization.passwordHashed);
 
       expect(isPasswordCorrectlyHashed).toBe(true);
    });
@@ -48,7 +48,7 @@ describe('Create user use case', () => {
       const encryptSpy = vi.spyOn(bcryptAdapter, 'encrypt');
 
       await sut.execute({
-         name: 'John Doe',
+         responsibleName: 'John Doe',
          mail: 'john@mail.com',
          fullAddress: 'full address, 30',
          phone: '14999999999',
@@ -63,7 +63,7 @@ describe('Create user use case', () => {
       const mail = 'john@mail.com';
 
       await sut.execute({
-         name: 'John Doe',
+         responsibleName: 'John Doe',
          mail,
          fullAddress: 'full address, 30',
          phone: '14999999999',
@@ -73,13 +73,13 @@ describe('Create user use case', () => {
 
       await expect(() => {
          return sut.execute({
-            name: 'John Doe',
+            responsibleName: 'John Doe',
             mail,
             fullAddress: 'full address, 30',
             phone: '14999999999',
             postalCode: '88888888',
             password: 'abc123',
          });
-      }).rejects.toBeInstanceOf(UserAlreadyExists);
+      }).rejects.toBeInstanceOf(OrganizationAlreadyExists);
    });
 })
